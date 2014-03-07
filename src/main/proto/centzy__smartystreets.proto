@@ -81,6 +81,24 @@ enum ZipcodeType {
 }
 
 message StreetAddressRequest {
+  optional StreetAddressRequestHeader street_address_request_header = 1;
+  optional StreetAddressRequestBody street_address_request_body = 2;
+}
+
+message RepeatedStreetAddressRequest {
+  optional StreetAddressRequestHeader street_address_request_header = 1;
+  repeated StreetAddressRequestBody street_address_request_body = 2;
+}
+
+message StreetAddressRequestHeader {
+  optional string auth_id = 1;
+  optional string auth_token = 2;
+  optional bool standardize_only = 3 [default = false];
+  optional bool include_invalid = 4 [default = false];
+  optional bool accept_keypair = 5 [default = false];
+}
+
+message StreetAddressRequestBody {
   optional string input_id = 1;
   optional string street = 2;
   optional string street2 = 3;
@@ -92,6 +110,10 @@ message StreetAddressRequest {
   optional string addressee = 9;
   optional string urbanization = 10;
   optional uint32 candidates = 11;
+}
+
+message RepeatedStreetAddressResponse {
+  repeated StreetAddressResponse street_address_response = 1;
 }
 
 message StreetAddressResponse {
@@ -130,23 +152,23 @@ message StreetAddressResponse {
 
   message Metadata {
     enum RecordType {
-      RECORD_TYPE_FIRM = 1;
-      RECORD_TYPE_GENERAL_DELIVERY = 2;
-      RECORD_TYPE_HIGH_RISE = 3;
-      RECORD_TYPE_PO_BOX = 4;
-      RECORD_TYPE_RURAL_ROUTE_OR_HIGHWAY_CONTRACT = 5;
-      RECORD_TYPE_STREET = 6;
+      RECORD_TYPE_F = 1;
+      RECORD_TYPE_G = 2;
+      RECORD_TYPE_H = 3;
+      RECORD_TYPE_P = 4;
+      RECORD_TYPE_R = 5;
+      RECORD_TYPE_S = 6;
     }
 
     enum ResidentialDeliveryIndicator {
-      RESIDENTIAL_DELIVERY_INDICATORR_RESIDENTIAL = 1;
-      RESIDENTIAL_DELIVERY_INDICATORR_COMMERCIAL = 2;
-      RESIDENTIAL_DELIVERY_INDICATORR_UNKNOWN = 3;
+      RESIDENTIAL_DELIVERY_INDICATOR_RESIDENTIAL = 1;
+      RESIDENTIAL_DELIVERY_INDICATOR_COMMERCIAL = 2;
+      RESIDENTIAL_DELIVERY_INDICATOR_UNKNOWN = 3;
     }
 
     enum ElotSort {
-      ELOT_SORT_ASCENDING = 1;
-      ELOT_SORT_DESCENDING = 2;
+      ELOT_SORT_A = 1;
+      ELOT_SORT_D = 2;
     }
 
     enum Precision {
@@ -179,6 +201,37 @@ message StreetAddressResponse {
       TIME_ZONE_UTC_PLUS_12 = 13;
     }
 
+    enum Footnote {
+      FOOTNOTE_A = 1;
+      FOOTNOTE_B = 2;
+      FOOTNOTE_C = 3;
+      FOOTNOTE_D = 4;
+      FOOTNOTE_E = 5;
+      FOOTNOTE_F = 6;
+      FOOTNOTE_G = 7;
+      FOOTNOTE_H = 8;
+      FOOTNOTE_I = 9;
+      FOOTNOTE_J = 10;
+      FOOTNOTE_K = 11;
+      FOOTNOTE_L = 12;
+      FOOTNOTE_LL = 13;
+      FOOTNOTE_LI = 14;
+      FOOTNOTE_M = 15;
+      FOOTNOTE_N = 16;
+      FOOTNOTE_O = 17;
+      FOOTNOTE_P = 18;
+      FOOTNOTE_Q = 19;
+      FOOTNOTE_R = 20;
+      FOOTNOTE_S = 21;
+      FOOTNOTE_T = 22;
+      FOOTNOTE_U = 23;
+      FOOTNOTE_V = 24;
+      FOOTNOTE_W = 25;
+      FOOTNOTE_X = 26;
+      FOOTNOTE_Y = 27;
+      FOOTNOTE_Z = 28;
+    }
+
     optional RecordType record_type = 1;
     optional ZipcodeType zipcode_type = 2;
     optional string county_fips = 3;
@@ -193,6 +246,7 @@ message StreetAddressResponse {
     optional TimeZone time_zone = 12;
     optional sint64 utc_offset = 13;
     optional bool dst = 14;
+    repeated Footnote footnote = 15;
   }
 
   message Analysis {
@@ -259,9 +313,28 @@ message StreetAddressResponse {
 }
 
 message ZipcodeRequest {
+  optional ZipcodeRequestHeader zipcode_request_header = 1;
+  optional ZipcodeRequestBody zipcode_request_body = 2;
+}
+
+message RepeatedZipcodeRequest {
+  optional ZipcodeRequestHeader zipcode_request_header = 1;
+  repeated ZipcodeRequestBody zipcode_request_body = 2;
+}
+
+message ZipcodeRequestHeader {
+  optional string auth_id = 1;
+  optional string auth_token = 2;
+}
+
+message ZipcodeRequestBody {
   optional string city = 1;
   optional string state = 2;
   optional string zipcode = 3;
+}
+
+message RepeatedZipcodeResponse {
+  repeated ZipcodeResponse zipcode_response = 1;
 }
 
 message ZipcodeResponse {
@@ -297,4 +370,8 @@ message ZipcodeResponse {
 }
 
 service SmartyStreetsService {
+  rpc HandleStreetAddress(StreetAddressRequest) returns (StreetAddressResponse);
+  rpc HandleRepeatedStreetAddress(RepeatedStreetAddressRequest) returns (RepeatedStreetAddressResponse);
+  rpc HandleZipcode(ZipcodeRequest) returns (ZipcodeResponse);
+  rpc HandleRepeatedZipcode(RepeatedZipcodeRequest) returns (RepeatedZipcodeResponse);
 }
