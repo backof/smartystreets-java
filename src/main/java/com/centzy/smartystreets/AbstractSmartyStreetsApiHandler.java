@@ -61,6 +61,17 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
   abstract JSONObject getRequestJSONObject(RequestBody requestBody);
   abstract Response getResponse(JSONObject responseJSONObject);
 
+  static <T> void putOptionalField(JSONObject jsonObject, String key, Message message, Class<T> fieldClass, int fieldNumber) {
+    T optionalField = getOptionalField(message, fieldClass, fieldNumber);
+    if (optionalField != null) {
+      jsonObject.put(key, optionalField);
+    }
+  }
+
+  static <T> void putRequiredField(JSONObject jsonObject, String key, Message message, Class<T> fieldClass, int fieldNumber) {
+    jsonObject.put(key, getRequiredField(message, fieldClass, fieldNumber));
+  }
+
   static <T> T getOptionalField(Message message, Class<T> fieldClass, int fieldNumber) {
     Descriptors.FieldDescriptor fieldDescriptor = getFieldDesciptor(message, fieldNumber);
     if (!message.hasField(fieldDescriptor)) {

@@ -46,7 +46,19 @@ class SmartyStreetsStreetAddressApiHandler
 
   @Override
   JSONObject getRequestJSONObject(StreetAddressRequestBody streetAddressRequestBody) {
-    return null;
+    JSONObject jsonObject = new JSONObject();
+    putOptionalField(jsonObject, "input_id", streetAddressRequestBody, String.class, 1);
+    putRequiredField(jsonObject, "street", streetAddressRequestBody, String.class, 2);
+    putOptionalField(jsonObject, "street2", streetAddressRequestBody, String.class, 3);
+    putOptionalField(jsonObject, "secondary", streetAddressRequestBody, String.class, 4);
+    putOptionalField(jsonObject, "city", streetAddressRequestBody, String.class, 5);
+    putOptionalField(jsonObject, "state", streetAddressRequestBody, String.class, 6);
+    putOptionalField(jsonObject, "zipcode", streetAddressRequestBody, String.class, 7);
+    putOptionalField(jsonObject, "lastline", streetAddressRequestBody, String.class, 8);
+    putOptionalField(jsonObject, "addressee", streetAddressRequestBody, String.class, 9);
+    putOptionalField(jsonObject, "urbanization", streetAddressRequestBody, String.class, 10);
+    putOptionalField(jsonObject, "candidates", streetAddressRequestBody, Integer.class, 11);
+    return jsonObject;
   }
 
   @Override
