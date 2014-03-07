@@ -1,0 +1,300 @@
+// Author: peter@centzy.com (Peter Edge)
+
+package centzy.smartystreets;
+
+option java_package = "com.centzy.smartystreets";
+option java_multiple_files = true;
+option java_generate_equals_and_hash = true;
+option java_generic_services = true;
+option optimize_for = SPEED;
+
+message Coordinate {
+  optional sint64 latitude_picos = 1;
+  optional sint64 longitude_picos = 2;
+}
+
+enum State {
+  STATE_AL = 1;
+  STATE_AK = 2;
+  STATE_AZ = 3;
+  STATE_AR = 4;
+  STATE_CA = 5;
+  STATE_CO = 6;
+  STATE_CT = 7;
+  STATE_DE = 8;
+  STATE_FL = 9;
+  STATE_GA = 10;
+  STATE_HI = 11;
+  STATE_ID = 12;
+  STATE_IL = 13;
+  STATE_IN = 14;
+  STATE_IA = 15;
+  STATE_KS = 16;
+  STATE_KY = 17;
+  STATE_LA = 18;
+  STATE_ME = 19;
+  STATE_MD = 20;
+  STATE_MA = 21;
+  STATE_MI = 22;
+  STATE_MN = 23;
+  STATE_MS = 24;
+  STATE_MO = 25;
+  STATE_MT = 26;
+  STATE_NE = 27;
+  STATE_NV = 28;
+  STATE_NH = 29;
+  STATE_NJ = 30;
+  STATE_NM = 31;
+  STATE_NY = 32;
+  STATE_NC = 33;
+  STATE_ND = 34;
+  STATE_OH = 35;
+  STATE_OK = 36;
+  STATE_OR = 37;
+  STATE_PA = 38;
+  STATE_RI = 39;
+  STATE_SC = 40;
+  STATE_SD = 41;
+  STATE_TN = 42;
+  STATE_TX = 43;
+  STATE_UT = 44;
+  STATE_VT = 45;
+  STATE_VA = 46;
+  STATE_WA = 47;
+  STATE_WV = 48;
+  STATE_WI = 49;
+  STATE_WY = 50;
+  STATE_DC = 51;
+  STATE_AS = 52;
+  STATE_GU = 53;
+  STATE_MP = 54;
+  STATE_PR = 55;
+  STATE_UM = 56;
+  STATE_VI = 57;
+}
+
+enum ZipcodeType {
+  ZIPCODE_TYPE_STANDARD = 1;
+  ZIPCODE_TYPE_MILITARY = 2;
+  ZIPCODE_TYPE_PO_BOX = 3;
+  ZIPCODE_TYPE_UNIQUE = 4;
+}
+
+message StreetAddressRequest {
+  optional string input_id = 1;
+  optional string street = 2;
+  optional string street2 = 3;
+  optional string secondary = 4;
+  optional string city = 5;
+  optional string state = 6;
+  optional string zipcode = 7;
+  optional string lastline = 8;
+  optional string addressee = 9;
+  optional string urbanization = 10;
+  optional uint32 candidates = 11;
+}
+
+message StreetAddressResponse {
+  message Components {
+    enum StreetDirection {
+      STREET_DIRECTION_N = 1;
+      STREET_DIRECTION_S = 2;
+      STREET_DIRECTION_E = 3;
+      STREET_DIRECTION_W = 4;
+      STREET_DIRECTION_NE = 5;
+      STREET_DIRECTION_SE = 6;
+      STREET_DIRECTION_NW = 7;
+      STREET_DIRECTION_SW = 8;
+    }
+
+    optional string urbanization = 1;
+    optional string primary_number = 2;
+    optional string street_name = 3;
+    optional StreetDirection street_predirection = 4;
+    optional StreetDirection street_postdirection = 5;
+    optional string street_suffix = 6;
+    optional string secondary_number = 7;
+    optional string secondary_designator = 8;
+    optional string extra_secondary_number = 9;
+    optional string extra_secondary_designator = 10;
+    optional string pmb_designator = 11;
+    optional string pmb_number = 12;
+    optional string city_name = 13;
+    optional string default_city_name = 14;
+    optional State state = 15;
+    optional string zipcode = 16;
+    optional string plus4_code = 17;
+    optional string delivery_point = 18;
+    optional string delivery_point_check_digit = 19;
+  }
+
+  message Metadata {
+    enum RecordType {
+      RECORD_TYPE_FIRM = 1;
+      RECORD_TYPE_GENERAL_DELIVERY = 2;
+      RECORD_TYPE_HIGH_RISE = 3;
+      RECORD_TYPE_PO_BOX = 4;
+      RECORD_TYPE_RURAL_ROUTE_OR_HIGHWAY_CONTRACT = 5;
+      RECORD_TYPE_STREET = 6;
+    }
+
+    enum ResidentialDeliveryIndicator {
+      RESIDENTIAL_DELIVERY_INDICATORR_RESIDENTIAL = 1;
+      RESIDENTIAL_DELIVERY_INDICATORR_COMMERCIAL = 2;
+      RESIDENTIAL_DELIVERY_INDICATORR_UNKNOWN = 3;
+    }
+
+    enum ElotSort {
+      ELOT_SORT_ASCENDING = 1;
+      ELOT_SORT_DESCENDING = 2;
+    }
+
+    enum Precision {
+      PRECISION_UNKNOWN = 1;
+      PRECISION_NONE = 2;
+      PRECISION_STATE = 3;
+      PRECISION_SOLUTION_AREA = 4;
+      PRECISION_CITY = 5;
+      PRECISION_ZIP_5 = 6;
+      PRECISION_ZIP_6 = 7;
+      PRECISION_ZIP_7 = 8;
+      PRECISION_ZIP_8 = 9;
+      PRECISION_ZIP_9 = 10;
+      PRECISION_STRUCTURE = 11;
+    }
+
+    enum TimeZone {
+      TIME_ZONE_ALASKA = 1;
+      TIME_ZONE_ATLANTIC = 2;
+      TIME_ZONE_CENTRAL = 3;
+      TIME_ZONE_EASTERN = 4;
+      TIME_ZONE_HAWAII = 5;
+      TIME_ZONE_MOUNTAIN = 6;
+      TIME_ZONE_NONE = 7;
+      TIME_ZONE_PACIFIC = 8;
+      TIME_ZONE_SAMOA = 9;
+      TIME_ZONE_UTC_PLUS_9 = 10;
+      TIME_ZONE_UTC_PLUS_10 = 11;
+      TIME_ZONE_UTC_PLUS_11 = 12;
+      TIME_ZONE_UTC_PLUS_12 = 13;
+    }
+
+    optional RecordType record_type = 1;
+    optional ZipcodeType zipcode_type = 2;
+    optional string county_fips = 3;
+    optional string county_name = 4;
+    optional string carrier_route = 5;
+    optional string congressional_district = 6;
+    optional string building_default_indicator = 7;
+    optional ResidentialDeliveryIndicator residential_delivery_indicator = 8;
+    optional ElotSort elot_sort = 9;
+    optional Coordinate coordinate = 10;
+    optional Precision precision = 11;
+    optional TimeZone time_zone = 12;
+    optional sint64 utc_offset = 13;
+    optional bool dst = 14;
+  }
+
+  message Analysis {
+    enum DpvMatchCode {
+      DPV_MATCH_CODE_Y = 1;
+      DPV_MATCH_CODE_N = 2;
+      DPV_MATCH_CODE_S = 3;
+      DPV_MATCH_CODE_D = 4;
+    }
+
+    enum DpvFootnotes {
+      DPV_FOOTNOTES_AA = 1;
+      DPV_FOOTNOTES_A1 = 2;
+      DPV_FOOTNOTES_BB = 3;
+      DPV_FOOTNOTES_CC = 4;
+      DPV_FOOTNOTES_F1 = 5;
+      DPV_FOOTNOTES_G1 = 6;
+      DPV_FOOTNOTES_M1 = 7;
+      DPV_FOOTNOTES_M3 = 8;
+      DPV_FOOTNOTES_N1 = 9;
+      DPV_FOOTNOTES_P1 = 10;
+      DPV_FOOTNOTES_P3 = 11;
+      DPV_FOOTNOTES_RR = 12;
+      DPV_FOOTNOTES_R1 = 13;
+      DPV_FOOTNOTES_U1 = 14;
+    }
+
+    enum LacslinkCode {
+      LACSLINK_CODE_A = 1;
+      LACSLINK_CODE_00 = 2;
+      LACSLINK_CODE_09 = 3;
+      LACSLINK_CODE_14 = 4;
+      LACSLINK_CODE_92 = 5;
+    }
+
+    enum LacslinkIndicator {
+      LACSLINK_INDICATOR_Y = 1;
+      LACSLINK_INDICATOR_S = 2;
+      LACSLINK_INDICATOR_N = 3;
+      LACSLINK_INDICATOR_F = 4;
+    }
+
+    optional DpvMatchCode dpv_match_code = 1;
+    optional DpvFootnotes dpv_footnotes = 2;
+    optional bool dpv_cmra = 3;
+    optional bool dpv_vacant = 4;
+    optional bool active = 5;
+    optional bool ews_match = 6;
+    optional string footnotes = 7;
+    optional LacslinkCode lacslink_code = 8;
+    optional LacslinkIndicator lacslink_indicator = 9;
+  }
+
+  optional uint32 input_index = 1;
+  optional uint32 candidate_index = 2;
+  optional string addressee = 3;
+  optional string delivery_line_1 = 4;
+  optional string delivery_line_2 = 5;
+  optional string last_line = 6;
+  optional string delivery_point_barcode = 7;
+  optional Components components = 8;
+  optional Metadata metadata = 9;
+  optional Analysis analysis = 10;
+}
+
+message ZipcodeRequest {
+  optional string city = 1;
+  optional string state = 2;
+  optional string zipcode = 3;
+}
+
+message ZipcodeResponse {
+  message CityState {
+    optional string city = 1;
+    optional State state = 2;
+  }
+
+  message Zipcode {
+    optional string zipcode = 1;
+    optional ZipcodeType zipcode_type = 2;
+    optional string county_fips = 3;
+    optional string county_name = 4;
+    optional Coordinate coordinate = 5;
+  }
+
+  message Error {
+    enum Status {
+      BLANK = 1;
+      INVALID_STATE = 2;
+      INVALID_CITY = 3;
+      INVALID_ZIPCODE = 4;
+      CONFLICT = 5;
+    }
+
+    optional Status status = 1;
+    optional string reason = 2;
+  }
+
+  optional Error error = 1;
+  repeated CityState city_state = 2;
+  repeated Zipcode zipcode = 3;
+}
+
+service SmartyStreetsService {
+}
