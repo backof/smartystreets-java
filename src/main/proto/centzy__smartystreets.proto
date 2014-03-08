@@ -201,6 +201,47 @@ message StreetAddressResponse {
       TIME_ZONE_UTC_PLUS_12 = 13;
     }
 
+    optional RecordType record_type = 1;
+    optional ZipcodeType zipcode_type = 2;
+    optional string county_fips = 3;
+    optional string county_name = 4;
+    optional string carrier_route = 5;
+    optional string congressional_district = 6;
+    optional string building_default_indicator = 7;
+    optional ResidentialDeliveryIndicator residential_delivery_indicator = 8;
+    optional ElotSort elot_sort = 9;
+    optional Coordinate coordinate = 10;
+    optional Precision precision = 11;
+    optional TimeZone time_zone = 12;
+    optional sint32 utc_offset = 13;
+    optional bool dst = 14;
+  }
+
+  message Analysis {
+    enum DpvMatchCode {
+      DPV_MATCH_CODE_Y = 1;
+      DPV_MATCH_CODE_N = 2;
+      DPV_MATCH_CODE_S = 3;
+      DPV_MATCH_CODE_D = 4;
+    }
+
+    enum DpvFootnote {
+      DPV_FOOTNOTE_AA = 1;
+      DPV_FOOTNOTE_A1 = 2;
+      DPV_FOOTNOTE_BB = 3;
+      DPV_FOOTNOTE_CC = 4;
+      DPV_FOOTNOTE_F1 = 5;
+      DPV_FOOTNOTE_G1 = 6;
+      DPV_FOOTNOTE_M1 = 7;
+      DPV_FOOTNOTE_M3 = 8;
+      DPV_FOOTNOTE_N1 = 9;
+      DPV_FOOTNOTE_P1 = 10;
+      DPV_FOOTNOTE_P3 = 11;
+      DPV_FOOTNOTE_RR = 12;
+      DPV_FOOTNOTE_R1 = 13;
+      DPV_FOOTNOTE_U1 = 14;
+    }
+
     enum Footnote {
       FOOTNOTE_A = 1;
       FOOTNOTE_B = 2;
@@ -232,48 +273,6 @@ message StreetAddressResponse {
       FOOTNOTE_Z = 28;
     }
 
-    optional RecordType record_type = 1;
-    optional ZipcodeType zipcode_type = 2;
-    optional string county_fips = 3;
-    optional string county_name = 4;
-    optional string carrier_route = 5;
-    optional string congressional_district = 6;
-    optional string building_default_indicator = 7;
-    optional ResidentialDeliveryIndicator residential_delivery_indicator = 8;
-    optional ElotSort elot_sort = 9;
-    optional Coordinate coordinate = 10;
-    optional Precision precision = 11;
-    optional TimeZone time_zone = 12;
-    optional sint32 utc_offset = 13;
-    optional bool dst = 14;
-    repeated Footnote footnote = 15;
-  }
-
-  message Analysis {
-    enum DpvMatchCode {
-      DPV_MATCH_CODE_Y = 1;
-      DPV_MATCH_CODE_N = 2;
-      DPV_MATCH_CODE_S = 3;
-      DPV_MATCH_CODE_D = 4;
-    }
-
-    enum DpvFootnotes {
-      DPV_FOOTNOTES_AA = 1;
-      DPV_FOOTNOTES_A1 = 2;
-      DPV_FOOTNOTES_BB = 3;
-      DPV_FOOTNOTES_CC = 4;
-      DPV_FOOTNOTES_F1 = 5;
-      DPV_FOOTNOTES_G1 = 6;
-      DPV_FOOTNOTES_M1 = 7;
-      DPV_FOOTNOTES_M3 = 8;
-      DPV_FOOTNOTES_N1 = 9;
-      DPV_FOOTNOTES_P1 = 10;
-      DPV_FOOTNOTES_P3 = 11;
-      DPV_FOOTNOTES_RR = 12;
-      DPV_FOOTNOTES_R1 = 13;
-      DPV_FOOTNOTES_U1 = 14;
-    }
-
     enum LacslinkCode {
       LACSLINK_CODE_A = 1;
       LACSLINK_CODE_00 = 2;
@@ -290,14 +289,15 @@ message StreetAddressResponse {
     }
 
     optional DpvMatchCode dpv_match_code = 1;
-    optional DpvFootnotes dpv_footnotes = 2;
+    repeated DpvFootnote dpv_footnote = 2;
     optional bool dpv_cmra = 3;
     optional bool dpv_vacant = 4;
     optional bool active = 5;
     optional bool ews_match = 6;
-    optional string footnotes = 7;
+    repeated Footnote footnote = 7;
     optional LacslinkCode lacslink_code = 8;
     optional LacslinkIndicator lacslink_indicator = 9;
+    optional bool suitelink_match = 10;
   }
 
   optional string input_id = 1;

@@ -1,6 +1,7 @@
 package com.centzy.smartystreets;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -11,6 +12,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import javax.annotation.Nullable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -26,16 +28,33 @@ import java.util.Map;
  */
 abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, RequestBody extends Message, Response extends Message> {
 
+  static final long PICOS = 1000000000000L;
+
+  static final ImmutableBiMap<String, State> STATE_BI_MAP;
+
+  static {
+    ImmutableBiMap.Builder<String, State> builder = new ImmutableBiMap.Builder<>();
+    for (State state : State.values()) {
+      builder.put(state.name().replace("STATE_", ""), state);
+    }
+    STATE_BI_MAP = builder.build();
+  }
+
+  static final ImmutableBiMap<String, Boolean> YES_NO_BI_MAP = new ImmutableBiMap.Builder<String, Boolean>()
+      .put("Y", true)
+      .put("N", false)
+      .build();
+
+  static final ImmutableBiMap<String, Boolean> TRUE_FALSE_BI_MAP = new ImmutableBiMap.Builder<String, Boolean>()
+      .put("true", true)
+      .put("false", false)
+      .build();
+
   private static final String BASE_API_URL = "https://api.smartystreets.com";
 
   private static final ImmutableMap<String, String> BASE_REQUEST_PROPERTIES = ImmutableMap.of(
       "Content-Type", "application/json",
       "Accept", "application/json"
-  );
-
-  private static final ImmutableBiMap<Boolean, String> BOOLEAN_TO_STRING_MAP = ImmutableBiMap.of(
-      true, "Y",
-      false, "N"
   );
 
   Response call(RequestHeader requestHeader, RequestBody requestBody) {
@@ -86,6 +105,16 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
   }
 
   static <T> void putOptionalField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
+                                   JSONObject jsonObject, String key, ImmutableBiMap<String, T> biMap) {
+    putField(builder, fieldClass, fieldNumber, jsonObject, key, false, biMap);
+  }
+
+  static <T> void putRequiredField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
+                                   JSONObject jsonObject, String key, ImmutableBiMap<String, T> biMap) {
+    putField(builder, fieldClass, fieldNumber, jsonObject, key, true, biMap);
+  }
+
+  static <T> void putOptionalField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
                                    JSONObject jsonObject, String key, Function<String, T> handler) {
     putField(builder, fieldClass, fieldNumber, jsonObject, key, false, handler);
   }
@@ -101,6 +130,19 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
 
   static <T> T getRequiredField(Message message, Class<T> fieldClass, int fieldNumber) {
     return getField(message, fieldClass, fieldNumber, true);
+  }
+
+  @Nullable
+  static Coordinate getOptionalCoordinate(JSONObject responseJSONObject) {
+    if (responseJSONObject.containsKey("latitude") && responseJSONObject.containsKey("longitude")) {
+      Double latitude = (Double) responseJSONObject.get("latitude");
+      Double longitude = (Double) responseJSONObject.get("longitude");
+      return Coordinate.newBuilder()
+          .setLatitudePicos((long) (latitude * PICOS))
+          .setLongitudePicos((long) (longitude * PICOS))
+          .build();
+    }
+    return null;
   }
 
   private ImmutableList<JSONObject> call(
@@ -206,6 +248,16 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
     } else if (required) {
       throw new IllegalArgumentException("Required field " + key + " not set");
     }
+  }
+
+  private static <T> void putField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
+                                   JSONObject jsonObject, String key, boolean required, final ImmutableBiMap<String, T> biMap) {
+   putField(builder, fieldClass, fieldNumber, jsonObject, key, required, new Function<String, T>() {
+     @Override
+     public T apply(String input) {
+       return Preconditions.checkNotNull(biMap.get(input));
+     }
+   });
   }
 
   private static <T> void putField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
