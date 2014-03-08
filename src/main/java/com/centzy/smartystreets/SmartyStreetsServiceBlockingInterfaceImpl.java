@@ -1,6 +1,7 @@
 package com.centzy.smartystreets;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.protobuf.Message;
 import com.google.protobuf.RpcController;
 import com.google.protobuf.ServiceException;
@@ -10,7 +11,11 @@ import com.google.protobuf.ServiceException;
  */
 public class SmartyStreetsServiceBlockingInterfaceImpl implements SmartyStreetsService.BlockingInterface {
 
-  private final SmartyStreetsServiceImpl smartyStreetsService = new SmartyStreetsServiceImpl();
+  private final SmartyStreetsServiceImpl smartyStreetsService;
+
+  SmartyStreetsServiceBlockingInterfaceImpl(SmartyStreetsServiceImpl smartyStreetsService) {
+    this.smartyStreetsService = Preconditions.checkNotNull(smartyStreetsService);
+  }
 
   @Override
   public StreetAddressResponse handleStreetAddress(

@@ -16,18 +16,19 @@ public class SmartyStreetsServiceInterfaceImpl implements SmartyStreetsService.I
 
   private static final int DEFAULT_NUM_THREADS = 4;
 
-  private final SmartyStreetsServiceImpl smartyStreetsService = new SmartyStreetsServiceImpl();
+  private final SmartyStreetsServiceImpl smartyStreetsService;
   private final ExecutorService executorService;
 
-  SmartyStreetsServiceInterfaceImpl() {
-    this(DEFAULT_NUM_THREADS);
+  SmartyStreetsServiceInterfaceImpl(SmartyStreetsServiceImpl smartyStreetsService) {
+    this(smartyStreetsService, DEFAULT_NUM_THREADS);
   }
 
-  SmartyStreetsServiceInterfaceImpl(int nThreads) {
-    this(Executors.newFixedThreadPool(nThreads));
+  SmartyStreetsServiceInterfaceImpl(SmartyStreetsServiceImpl smartyStreetsService, int nThreads) {
+    this(smartyStreetsService, Executors.newFixedThreadPool(nThreads));
   }
 
-  SmartyStreetsServiceInterfaceImpl(ExecutorService executorService) {
+  SmartyStreetsServiceInterfaceImpl(SmartyStreetsServiceImpl smartyStreetsService, ExecutorService executorService) {
+    this.smartyStreetsService = Preconditions.checkNotNull(smartyStreetsService);
     this.executorService = Preconditions.checkNotNull(executorService);
   }
 

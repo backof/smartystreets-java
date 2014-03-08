@@ -1,5 +1,7 @@
 package com.centzy.smartystreets;
 
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +30,12 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
 
   private static final ImmutableMap<String, String> BASE_REQUEST_PROPERTIES = ImmutableMap.of(
       "Content-Type", "application/json",
-      "Accept", "applicaiton/json"
+      "Accept", "application/json"
+  );
+
+  private static final ImmutableBiMap<Boolean, String> BOOLEAN_TO_STRING_MAP = ImmutableBiMap.of(
+      true, "Y",
+      false, "N"
   );
 
   Response call(RequestHeader requestHeader, RequestBody requestBody) {
@@ -62,39 +70,37 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
   abstract Response getResponse(JSONObject responseJSONObject);
 
   static <T> void putOptionalField(JSONObject jsonObject, String key, Message message, Class<T> fieldClass, int fieldNumber) {
-    T optionalField = getOptionalField(message, fieldClass, fieldNumber);
-    if (optionalField != null) {
-      jsonObject.put(key, optionalField);
-    }
+    putField(jsonObject, key, message, fieldClass, fieldNumber, false);
   }
 
   static <T> void putRequiredField(JSONObject jsonObject, String key, Message message, Class<T> fieldClass, int fieldNumber) {
-    jsonObject.put(key, getRequiredField(message, fieldClass, fieldNumber));
+    putField(jsonObject, key, message, fieldClass, fieldNumber, true);
+  }
+
+  static <T> void putOptionalField(Message.Builder builder, Class<T> fieldClass, int fieldNumber, JSONObject jsonObject, String key) {
+    putField(builder, fieldClass, fieldNumber, jsonObject, key, false);
+  }
+
+  static <T> void putRequiredField(Message.Builder builder, Class<T> fieldClass, int fieldNumber, JSONObject jsonObject, String key) {
+    putField(builder, fieldClass, fieldNumber, jsonObject, key, true);
+  }
+
+  static <T> void putOptionalField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
+                                   JSONObject jsonObject, String key, Function<String, T> handler) {
+    putField(builder, fieldClass, fieldNumber, jsonObject, key, false, handler);
+  }
+
+  static <T> void putRequiredField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
+                                   JSONObject jsonObject, String key, Function<String, T> handler) {
+    putField(builder, fieldClass, fieldNumber, jsonObject, key, true, handler);
   }
 
   static <T> T getOptionalField(Message message, Class<T> fieldClass, int fieldNumber) {
-    Descriptors.FieldDescriptor fieldDescriptor = getFieldDesciptor(message, fieldNumber);
-    if (!message.hasField(fieldDescriptor)) {
-      return null;
-    }
-    return (T) message.getField(fieldDescriptor);
+    return getField(message, fieldClass, fieldNumber, true);
   }
 
   static <T> T getRequiredField(Message message, Class<T> fieldClass, int fieldNumber) {
-    Descriptors.FieldDescriptor fieldDescriptor = getFieldDesciptor(message, fieldNumber);
-    if (!message.hasField(fieldDescriptor)) {
-      throw new IllegalArgumentException("No field for number " + fieldNumber + " on message " + message.toString());
-    }
-    return (T) message.getField(fieldDescriptor);
-  }
-
-  static <T> ImmutableList<T> getRepeatedField(Message message, Class<T> fieldClass, int fieldNumber) {
-    Descriptors.FieldDescriptor fieldDescriptor = getFieldDesciptor(message, fieldNumber);
-    ImmutableList.Builder<T> builder = ImmutableList.builder();
-    for (int i = 0; i < message.getRepeatedFieldCount(fieldDescriptor); i++) {
-      builder.add((T) message.getRepeatedField(fieldDescriptor, i));
-    }
-    return builder.build();
+    return getField(message, fieldClass, fieldNumber, true);
   }
 
   private ImmutableList<JSONObject> call(
@@ -173,7 +179,70 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
     return builder.build();
   }
 
+  private static <T> ImmutableList<T> getRepeatedField(Message message, Class<T> fieldClass, int fieldNumber) {
+    Descriptors.FieldDescriptor fieldDescriptor = getFieldDesciptor(message, fieldNumber);
+    ImmutableList.Builder<T> builder = ImmutableList.builder();
+    for (int i = 0; i < message.getRepeatedFieldCount(fieldDescriptor); i++) {
+      builder.add((T) message.getRepeatedField(fieldDescriptor, i));
+    }
+    return builder.build();
+  }
+
+  private static <T> void putField(JSONObject jsonObject, String key, Message message, Class<T> fieldClass,
+                                   int fieldNumber, boolean required) {
+    checkClass(String.class, Integer.class);
+    T field = getField(message, fieldClass, fieldNumber, required);
+    if (field != null) {
+      jsonObject.put(key, field);
+    }
+  }
+
+
+  private static <T> void putField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
+                           JSONObject jsonObject, String key, boolean required) {
+    checkClass(String.class, Integer.class);
+    if (jsonObject.containsKey(key)) {
+      builder.setField(getFieldDesciptor(builder, fieldNumber), jsonObject.get(key));
+    } else if (required) {
+      throw new IllegalArgumentException("Required field " + key + " not set");
+    }
+  }
+
+  private static <T> void putField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
+                                   JSONObject jsonObject, String key, boolean required, Function<String, T> handler) {
+    if (jsonObject.containsKey(key)) {
+      builder.setField(getFieldDesciptor(builder, fieldNumber), handler.apply((String) jsonObject.get(key)));
+    } else if (required) {
+      throw new IllegalArgumentException("Required field " + key + " not set");
+    }
+  }
+
+  private static <T> T getField(Message message, Class<T> fieldClass, int fieldNumber, boolean required) {
+    Descriptors.FieldDescriptor fieldDescriptor = getFieldDesciptor(message, fieldNumber);
+    if (!message.hasField(fieldDescriptor)) {
+      if (required) {
+        throw new IllegalArgumentException("No field for number " + fieldNumber + " on message " + message.toString());
+      }
+      return null;
+    }
+    return (T) message.getField(fieldDescriptor);
+  }
+
   private static Descriptors.FieldDescriptor getFieldDesciptor(Message message, int fieldNumber) {
     return message.getDescriptorForType().findFieldByNumber(fieldNumber);
+  }
+
+  private static Descriptors.FieldDescriptor getFieldDesciptor(Message.Builder builder, int fieldNumber) {
+    return builder.getDescriptorForType().findFieldByNumber(fieldNumber);
+  }
+
+  private static void checkClass(Class<?> actualClass, Class<?>...expectedClasses) {
+    for (Class<?> expectedClass : expectedClasses) {
+      if (actualClass.equals(expectedClass)) {
+        return;
+      }
+    }
+    throw new IllegalArgumentException("Expected one of classes " + Arrays.toString(expectedClasses)
+        + " , got " + actualClass.toString());
   }
 }
