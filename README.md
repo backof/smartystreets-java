@@ -28,9 +28,9 @@ StreetAddressRequestBody streetAddress2 = StreetAddressRequestBody.newBuilder()
   .setZipcode("94105")
   .build();
 
-# single call
+// single call
 StreetAddressResponse streetAddressResponse = handler.handleStreetAddress(streetAddress1);
-# batch call
+// batch call
 ImmutableList<StreetAddressResponse> streetAddressResponses = handler.handleStreetAddress(
   ImmutableList.of(streetAddress1, streetAddress2)
 );
@@ -43,16 +43,16 @@ ZipcodeRequestBody zipcode2 = ZipcodeRequestBody.newBuilder()
   .setZipcode("94105")
   .build();
 
-# single call
+// single call
 ZipcodeResponse zipcodeResponse = handler.handleZipcode(zipcode1);
-# batch call
+// batch call
 ImmutableList<ZipcodeResponse> zipcodeResponses = handler.handleZipcode(
   ImmutableList.of(zipcode1, zipcode2)
 );
 
-# new interface implementation
+// new interface implementation
 SmartyStreetsService.Interface smartyStreetsServiceInterface = new SmartyStreetsServiceInterfaceImpl();
-# new blocking interface implementation
+// new blocking interface implementation
 SmartyStreetsService.BlockingInterface smartyStreetsServiceBlockingInterface = new SmartyStreetsServiceBlockingInterfaceImpl();
 ```
 
