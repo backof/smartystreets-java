@@ -8,6 +8,8 @@ http://smartystreets.com/
 http://smartystreets.com/kb/liveaddress-api/  
 https://github.com/smartystreets/LiveAddressSamples/tree/master/java
 
+Wraps the API using a protocol buffers service defined in https://github.com/peter-edge/smartystreets-java/blob/master/src/main/proto/centzy__smartystreets.proto.
+
 ## Usage
 
 You must have a valid auth-id and auth-token from SmartyStreets.
