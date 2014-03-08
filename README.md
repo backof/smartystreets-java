@@ -9,6 +9,7 @@ http://smartystreets.com/kb/liveaddress-api/
 https://github.com/smartystreets/LiveAddressSamples/tree/master/java
 
 Wraps the API using a protocol buffers service defined in https://github.com/peter-edge/smartystreets-java/blob/master/src/main/proto/centzy__smartystreets.proto.  
+
 https://developers.google.com/protocol-buffers/docs/reference/java-generated#service
 
 ## Usage
