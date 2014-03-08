@@ -13,7 +13,11 @@ public class SmartyStreetsServiceBlockingInterfaceImpl implements SmartyStreetsS
 
   private final SmartyStreetsServiceImpl smartyStreetsService;
 
-  SmartyStreetsServiceBlockingInterfaceImpl(SmartyStreetsServiceImpl smartyStreetsService) {
+  public SmartyStreetsServiceBlockingInterfaceImpl() {
+    this(new SmartyStreetsServiceImpl());
+  }
+
+  public SmartyStreetsServiceBlockingInterfaceImpl(SmartyStreetsServiceImpl smartyStreetsService) {
     this.smartyStreetsService = Preconditions.checkNotNull(smartyStreetsService);
   }
 

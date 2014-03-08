@@ -19,15 +19,27 @@ public class SmartyStreetsServiceInterfaceImpl implements SmartyStreetsService.I
   private final SmartyStreetsServiceImpl smartyStreetsService;
   private final ExecutorService executorService;
 
-  SmartyStreetsServiceInterfaceImpl(SmartyStreetsServiceImpl smartyStreetsService) {
+  public SmartyStreetsServiceInterfaceImpl() {
+    this(new SmartyStreetsServiceImpl(), DEFAULT_NUM_THREADS);
+  }
+
+  public SmartyStreetsServiceInterfaceImpl(int nThreads) {
+    this(new SmartyStreetsServiceImpl(), Executors.newFixedThreadPool(nThreads));
+  }
+
+  public SmartyStreetsServiceInterfaceImpl(ExecutorService executorService) {
+    this(new SmartyStreetsServiceImpl(), executorService);
+  }
+
+  public SmartyStreetsServiceInterfaceImpl(SmartyStreetsServiceImpl smartyStreetsService) {
     this(smartyStreetsService, DEFAULT_NUM_THREADS);
   }
 
-  SmartyStreetsServiceInterfaceImpl(SmartyStreetsServiceImpl smartyStreetsService, int nThreads) {
+  public SmartyStreetsServiceInterfaceImpl(SmartyStreetsServiceImpl smartyStreetsService, int nThreads) {
     this(smartyStreetsService, Executors.newFixedThreadPool(nThreads));
   }
 
-  SmartyStreetsServiceInterfaceImpl(SmartyStreetsServiceImpl smartyStreetsService, ExecutorService executorService) {
+  public SmartyStreetsServiceInterfaceImpl(SmartyStreetsServiceImpl smartyStreetsService, ExecutorService executorService) {
     this.smartyStreetsService = Preconditions.checkNotNull(smartyStreetsService);
     this.executorService = Preconditions.checkNotNull(executorService);
   }
