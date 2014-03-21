@@ -232,7 +232,7 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
 
   private static <T> void putField(JSONObject jsonObject, String key, Message message, Class<T> fieldClass,
                                    int fieldNumber, boolean required) {
-    checkClass(String.class, Integer.class);
+    checkClass(fieldClass, String.class, Integer.class);
     T field = getField(message, fieldClass, fieldNumber, required);
     if (field != null) {
       jsonObject.put(key, field);
