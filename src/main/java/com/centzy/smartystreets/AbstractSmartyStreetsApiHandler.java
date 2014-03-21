@@ -242,7 +242,7 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
 
   private static <T> void putField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
                            JSONObject jsonObject, String key, boolean required) {
-    checkClass(String.class, Integer.class);
+    checkClass(fieldClass, String.class, Integer.class);
     if (jsonObject.containsKey(key)) {
       builder.setField(getFieldDesciptor(builder, fieldNumber), jsonObject.get(key));
     } else if (required) {
