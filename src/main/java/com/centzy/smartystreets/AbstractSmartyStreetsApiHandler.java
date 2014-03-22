@@ -16,9 +16,11 @@ import javax.annotation.Nullable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +53,7 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
       .build();
 
   private static final String BASE_API_URL = "https://api.smartystreets.com";
+  private static final String UTF_8_ENCODING = "UTF-8";
 
   private static final ImmutableMap<String, String> BASE_REQUEST_PROPERTIES = ImmutableMap.of(
       "Content-Type", "application/json",
@@ -183,7 +186,7 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
-    } catch (MalformedURLException e) {
+    } catch (MalformedURLException | UnsupportedEncodingException e) {
       throw new RuntimeException(e);
     }
   }
@@ -194,14 +197,14 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
     return jsonArray.toString();
   }
 
-  private String getUrlString(String authId, String authToken) {
+  private String getUrlString(String authId, String authToken) throws UnsupportedEncodingException {
     return new StringBuilder()
         .append(BASE_API_URL)
         .append(getApiRoute())
         .append("?auth-id=")
-        .append(authId)
+        .append(URLEncoder.encode(authId, UTF_8_ENCODING))
         .append("&auth-token=")
-        .append(authToken)
+        .append(URLEncoder.encode(authId, UTF_8_ENCODING))
         .toString();
   }
 
