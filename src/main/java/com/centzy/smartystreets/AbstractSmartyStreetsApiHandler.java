@@ -1,13 +1,17 @@
 package com.centzy.smartystreets;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.escape.Escaper;
+import com.google.common.net.PercentEscaper;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
+import com.google.protobuf.ProtocolMessageEnum;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -20,7 +24,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -47,13 +50,10 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
       .put("N", false)
       .build();
 
-  static final ImmutableBiMap<String, Boolean> TRUE_FALSE_BI_MAP = new ImmutableBiMap.Builder<String, Boolean>()
-      .put("true", true)
-      .put("false", false)
-      .build();
-
   private static final String BASE_API_URL = "https://api.smartystreets.com";
-  private static final String UTF_8_ENCODING = "UTF-8";
+  // TODO replace with UriEscapers when guava adds it back
+  private static final String URI_SAFECHARS_JAVA = "-_.*";
+  private static final Escaper URI_ESCAPER = new PercentEscaper(URI_SAFECHARS_JAVA, false);
 
   private static final ImmutableMap<String, String> BASE_REQUEST_PROPERTIES = ImmutableMap.of(
       "Content-Type", "application/json",
@@ -148,6 +148,13 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
     return null;
   }
 
+  static Integer getOptionalUtcOffset(JSONObject responseJSONObject) {
+    if (responseJSONObject.containsKey("utc_offset")) {
+      return (int) ((double) responseJSONObject.get("utc_offset"));
+    }
+    return null;
+  }
+
   private ImmutableList<JSONObject> call(
       String authId,
       String authToken,
@@ -198,13 +205,14 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
   }
 
   private String getUrlString(String authId, String authToken) throws UnsupportedEncodingException {
+
     return new StringBuilder()
         .append(BASE_API_URL)
         .append(getApiRoute())
         .append("?auth-id=")
-        .append(URLEncoder.encode(authId, UTF_8_ENCODING))
+        .append(URI_ESCAPER.escape(authId))
         .append("&auth-token=")
-        .append(URLEncoder.encode(authId, UTF_8_ENCODING))
+        .append(URI_ESCAPER.escape(authToken))
         .toString();
   }
 
@@ -235,7 +243,7 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
 
   private static <T> void putField(JSONObject jsonObject, String key, Message message, Class<T> fieldClass,
                                    int fieldNumber, boolean required) {
-    checkClass(fieldClass, String.class, Integer.class);
+    checkClass(fieldClass, String.class, Integer.class, Boolean.class);
     T field = getField(message, fieldClass, fieldNumber, required);
     if (field != null) {
       jsonObject.put(key, field);
@@ -245,9 +253,20 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
 
   private static <T> void putField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
                            JSONObject jsonObject, String key, boolean required) {
-    checkClass(fieldClass, String.class, Integer.class);
+    checkClass(fieldClass, String.class, Integer.class, Boolean.class);
     if (jsonObject.containsKey(key)) {
-      builder.setField(getFieldDesciptor(builder, fieldNumber), jsonObject.get(key));
+      Descriptors.FieldDescriptor fieldDescriptor = getFieldDesciptor(builder, fieldNumber);
+      Object jsonFieldObject = null;
+      switch (fieldDescriptor.getType()) {
+        case UINT32:
+          // Json parse gives us longs, Java 8 Integer class has support for unsigned
+          Long value = ((Number) jsonObject.get(key)).longValue();
+          jsonFieldObject = Integer.valueOf(value.toString());
+          break;
+        default:
+          jsonFieldObject = jsonObject.get(key);
+      }
+      builder.setField(getFieldDesciptor(builder, fieldNumber), jsonFieldObject);
     } else if (required) {
       throw new IllegalArgumentException("Required field " + key + " not set");
     }
@@ -258,7 +277,7 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
    putField(builder, fieldClass, fieldNumber, jsonObject, key, required, new Function<String, T>() {
      @Override
      public T apply(String input) {
-       return Preconditions.checkNotNull(biMap.get(input));
+       return checkNotNull(biMap.get(input), "No value for " + input);
      }
    });
   }
@@ -266,7 +285,16 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
   private static <T> void putField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
                                    JSONObject jsonObject, String key, boolean required, Function<String, T> handler) {
     if (jsonObject.containsKey(key)) {
-      builder.setField(getFieldDesciptor(builder, fieldNumber), handler.apply((String) jsonObject.get(key)));
+      Object object = handler.apply((String) jsonObject.get(key));
+      if (object instanceof ProtocolMessageEnum) {
+        Descriptors.EnumDescriptor enumDescriptor = builder.getDescriptorForType().findFieldByNumber(fieldNumber).getEnumType();
+        checkNotNull(enumDescriptor, "No enumDescriptor for " + fieldClass.getSimpleName());
+        Descriptors.EnumValueDescriptor enumValueDescriptor = enumDescriptor.findValueByNumber(((ProtocolMessageEnum) object).getNumber());
+        checkNotNull(enumValueDescriptor, "No enumValueDescriptor for " + ((ProtocolMessageEnum) object).getNumber());
+
+        object = enumValueDescriptor;
+      }
+      builder.setField(getFieldDesciptor(builder, fieldNumber), object);
     } else if (required) {
       throw new IllegalArgumentException("Required field " + key + " not set");
     }
