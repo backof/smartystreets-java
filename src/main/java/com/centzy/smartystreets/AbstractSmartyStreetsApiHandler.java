@@ -3,6 +3,7 @@ package com.centzy.smartystreets;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Function;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -191,10 +192,10 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
         dataInputStream.close();
         return responseBuilder.toString();
       } catch (IOException e) {
-        throw new RuntimeException(e);
+        throw Throwables.propagate(e);
       }
     } catch (MalformedURLException | UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
+      throw Throwables.propagate(e);
     }
   }
 
