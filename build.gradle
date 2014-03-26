@@ -14,7 +14,7 @@ buildscript {
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-group = "com.centzy.smartystreets"
+group = "com.centzy"
 version = '1.0'
 
 repositories {
