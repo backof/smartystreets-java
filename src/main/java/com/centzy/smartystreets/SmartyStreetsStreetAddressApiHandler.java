@@ -1,6 +1,5 @@
 package com.centzy.smartystreets;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import org.json.simple.JSONObject;
@@ -43,9 +42,9 @@ class SmartyStreetsStreetAddressApiHandler
   private static final ImmutableBiMap<String, StreetAddressResponse.Metadata.ResidentialDeliveryIndicator>
       RESIDENTIAL_DELIVERY_INDICATOR_BI_MAP
       = new ImmutableBiMap.Builder<String, StreetAddressResponse.Metadata.ResidentialDeliveryIndicator>()
-      .put("residential", StreetAddressResponse.Metadata.ResidentialDeliveryIndicator.RESIDENTIAL_DELIVERY_INDICATOR_RESIDENTIAL)
-      .put("commercial", StreetAddressResponse.Metadata.ResidentialDeliveryIndicator.RESIDENTIAL_DELIVERY_INDICATOR_COMMERCIAL)
-      .put("unknown", StreetAddressResponse.Metadata.ResidentialDeliveryIndicator.RESIDENTIAL_DELIVERY_INDICATOR_UNKNOWN)
+      .put("Residential", StreetAddressResponse.Metadata.ResidentialDeliveryIndicator.RESIDENTIAL_DELIVERY_INDICATOR_RESIDENTIAL)
+      .put("Commercial", StreetAddressResponse.Metadata.ResidentialDeliveryIndicator.RESIDENTIAL_DELIVERY_INDICATOR_COMMERCIAL)
+      .put("Unknown", StreetAddressResponse.Metadata.ResidentialDeliveryIndicator.RESIDENTIAL_DELIVERY_INDICATOR_UNKNOWN)
       .build();
 
   private static final ImmutableBiMap<String, StreetAddressResponse.Metadata.ElotSort> ELOT_SORT_BI_MAP
@@ -65,7 +64,7 @@ class SmartyStreetsStreetAddressApiHandler
       .put("Zip6", StreetAddressResponse.Metadata.Precision.PRECISION_ZIP_6)
       .put("Zip7", StreetAddressResponse.Metadata.Precision.PRECISION_ZIP_7)
       .put("Zip8", StreetAddressResponse.Metadata.Precision.PRECISION_ZIP_8)
-      .put("zip9", StreetAddressResponse.Metadata.Precision.PRECISION_ZIP_9)
+      .put("Zip9", StreetAddressResponse.Metadata.Precision.PRECISION_ZIP_9)
       .put("Structure", StreetAddressResponse.Metadata.Precision.PRECISION_STRUCTURE)
       .build();
 
@@ -274,14 +273,12 @@ class SmartyStreetsStreetAddressApiHandler
           metadataJSONObject, "precision", PRECISION_BI_MAP);
       putOptionalField(metadataBuilder, StreetAddressResponse.Metadata.TimeZone.class, 12,
           metadataJSONObject, "time_zone", TIME_ZONE_BI_MAP);
-      putOptionalField(metadataBuilder, Integer.class, 13, metadataJSONObject, "utc_offset");
+      Integer utcOffset = getOptionalUtcOffset(metadataJSONObject);
+      if (utcOffset != null) {
+        metadataBuilder.setUtcOffset(utcOffset);
+      }
       // TODO(pedge): will not set to false if not set
-      putOptionalField(metadataBuilder, Boolean.class, 14, metadataJSONObject, "dst", new Function<String, Boolean>() {
-        @Override
-        public Boolean apply(String input) {
-          return input.equals("true");
-        }
-      });
+      putOptionalField(metadataBuilder, Boolean.class, 14, metadataJSONObject, "dst");
       builder.setMetadata(metadataBuilder.build());
     }
     if (responseJSONObject.containsKey("analysis")) {
@@ -299,7 +296,7 @@ class SmartyStreetsStreetAddressApiHandler
       putOptionalField(analysisBuilder, Boolean.class, 3, analysisJSONObject, "dpv_cmra", YES_NO_BI_MAP);
       putOptionalField(analysisBuilder, Boolean.class, 4, analysisJSONObject, "dpv_vacant", YES_NO_BI_MAP);
       putOptionalField(analysisBuilder, Boolean.class, 5, analysisJSONObject, "active", YES_NO_BI_MAP);
-      putOptionalField(analysisBuilder, Boolean.class, 6, analysisJSONObject, "ews_match", TRUE_FALSE_BI_MAP);
+      putOptionalField(analysisBuilder, Boolean.class, 6, analysisJSONObject, "ews_match");
       if (analysisJSONObject.containsKey("footnotes")) {
         for (String footnote : ((String) analysisJSONObject.get("footnotes")).split("#")) {
           analysisBuilder.addFootnote(FOOTNOTE_BI_MAP.get(footnote));
@@ -309,7 +306,7 @@ class SmartyStreetsStreetAddressApiHandler
           analysisJSONObject, "lacslink_code", LACSLINK_CODE_CODE_BI_MAP);
       putOptionalField(analysisBuilder, StreetAddressResponse.Analysis.LacslinkIndicator.class, 9,
           analysisJSONObject, "lacslink_indicator", LACSLINK_INDICATOR_BI_MAP);
-      putOptionalField(analysisBuilder, Boolean.class, 10, analysisJSONObject, "suitelink_match", TRUE_FALSE_BI_MAP);
+      putOptionalField(analysisBuilder, Boolean.class, 10, analysisJSONObject, "suitelink_match");
       builder.setAnalysis(analysisBuilder.build());
     }
     return builder.build();

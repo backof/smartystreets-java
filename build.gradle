@@ -11,8 +11,8 @@ buildscript {
   }
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 group = "com.centzy"
 version = '1.0'
@@ -24,7 +24,7 @@ repositories {
 protocPath = '/usr/local/bin/protoc'
 
 dependencies {
-    compile group: 'com.google.guava', name: 'guava', version: '15.0'
+    compile group: 'com.google.guava', name: 'guava', version: '16.0.1'
     compile group: 'com.google.code.findbugs', name: 'jsr305', version: '2.0.2'
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1'
     compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
