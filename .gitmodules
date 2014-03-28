@@ -1,0 +1,3 @@
+[submodule "src/main/proto/smartystreets_proto"]
+	path = src/main/proto/smartystreets_proto
+	url = git://github.com/peter-edge/smartystreets_proto.git
