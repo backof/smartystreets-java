@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.centzy</groupId>
+  <artifactId>smartystreets-java</artifactId>
+  <version>1.0</version>
+  <versioning>
+    <versions>
+      <version>1.0</version>
+    </versions>
+    <lastUpdated>20140329170424</lastUpdated>
+  </versioning>
+</metadata>
