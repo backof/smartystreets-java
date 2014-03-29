@@ -12,8 +12,6 @@ buildscript {
   }
 }
 
-uploadArchives { repositories.mavenDeployer { repository(url: "file://${projectDir}/maven") } }
-
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
