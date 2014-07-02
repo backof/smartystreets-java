@@ -1,7 +1,5 @@
 package com.centzy.smartystreets;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableBiMap;
@@ -28,6 +26,8 @@ import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author Peter Edge (peter@locality.com).
@@ -253,7 +253,7 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
 
 
   private static <T> void putField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
-                           JSONObject jsonObject, String key, boolean required) {
+                                   JSONObject jsonObject, String key, boolean required) {
     checkClass(fieldClass, String.class, Integer.class, Boolean.class);
     if (jsonObject.containsKey(key)) {
       Descriptors.FieldDescriptor fieldDescriptor = getFieldDesciptor(builder, fieldNumber);
@@ -275,27 +275,30 @@ abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, Re
 
   private static <T> void putField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
                                    JSONObject jsonObject, String key, boolean required, final ImmutableBiMap<String, T> biMap) {
-   putField(builder, fieldClass, fieldNumber, jsonObject, key, required, new Function<String, T>() {
-     @Override
-     public T apply(String input) {
-       return checkNotNull(biMap.get(input), "No value for " + input);
-     }
-   });
+    putField(builder, fieldClass, fieldNumber, jsonObject, key, required, new Function<String, T>() {
+      @Override
+      public T apply(String input) {
+        return checkNotNull(biMap.get(input), "No value for " + input);
+      }
+    });
   }
 
   private static <T> void putField(Message.Builder builder, Class<T> fieldClass, int fieldNumber,
                                    JSONObject jsonObject, String key, boolean required, Function<String, T> handler) {
     if (jsonObject.containsKey(key)) {
-      Object object = handler.apply((String) jsonObject.get(key));
-      if (object instanceof ProtocolMessageEnum) {
-        Descriptors.EnumDescriptor enumDescriptor = builder.getDescriptorForType().findFieldByNumber(fieldNumber).getEnumType();
-        checkNotNull(enumDescriptor, "No enumDescriptor for " + fieldClass.getSimpleName());
-        Descriptors.EnumValueDescriptor enumValueDescriptor = enumDescriptor.findValueByNumber(((ProtocolMessageEnum) object).getNumber());
-        checkNotNull(enumValueDescriptor, "No enumValueDescriptor for " + ((ProtocolMessageEnum) object).getNumber());
+      String value = (String) jsonObject.get(key);
+      if (value != null && !value.isEmpty()) {
+        Object object = handler.apply(value);
+        if (object instanceof ProtocolMessageEnum) {
+          Descriptors.EnumDescriptor enumDescriptor = builder.getDescriptorForType().findFieldByNumber(fieldNumber).getEnumType();
+          checkNotNull(enumDescriptor, "No enumDescriptor for " + fieldClass.getSimpleName());
+          Descriptors.EnumValueDescriptor enumValueDescriptor = enumDescriptor.findValueByNumber(((ProtocolMessageEnum) object).getNumber());
+          checkNotNull(enumValueDescriptor, "No enumValueDescriptor for " + ((ProtocolMessageEnum) object).getNumber());
 
-        object = enumValueDescriptor;
+          object = enumValueDescriptor;
+        }
+        builder.setField(getFieldDesciptor(builder, fieldNumber), object);
       }
-      builder.setField(getFieldDesciptor(builder, fieldNumber), object);
     } else if (required) {
       throw new IllegalArgumentException("Required field " + key + " not set");
     }
