@@ -3,7 +3,7 @@ package com.centzy.smartystreets;
 import com.google.common.base.Preconditions;
 
 /**
- * @author Peter Edge (peter@locality.com).
+ * @author Peter Edge (peter.edge@gmail.com).
  */
 public class SmartyStreetsServiceImpl {
 

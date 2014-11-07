@@ -6,7 +6,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * @author Peter Edge (peter@locality.com).
+ * @author Peter Edge (peter.edge@gmail.com).
  */
 class SmartyStreetsZipcodeApiHandler extends AbstractSmartyStreetsApiHandler<ZipcodeRequestHeader, ZipcodeRequestBody, ZipcodeResponse> {
 

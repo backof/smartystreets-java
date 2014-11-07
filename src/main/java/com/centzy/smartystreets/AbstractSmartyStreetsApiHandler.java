@@ -30,7 +30,7 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * @author Peter Edge (peter@locality.com).
+ * @author Peter Edge (peter.edge@gmail.com).
  */
 abstract class AbstractSmartyStreetsApiHandler<RequestHeader extends Message, RequestBody extends Message, Response extends Message> {
 

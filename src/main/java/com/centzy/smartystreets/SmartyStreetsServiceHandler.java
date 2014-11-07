@@ -7,7 +7,7 @@ import com.google.common.collect.Iterables;
 import java.util.Collection;
 
 /**
- * @author Peter Edge (peter@locality.com).
+ * @author Peter Edge (peter.edge@gmail.com).
  */
 public class SmartyStreetsServiceHandler {
 

@@ -7,7 +7,7 @@ import com.google.protobuf.RpcController;
 import com.google.protobuf.ServiceException;
 
 /**
- * @author Peter Edge (peter@locality.com).
+ * @author Peter Edge (peter.edge@gmail.com).
  */
 public class SmartyStreetsServiceBlockingInterfaceImpl implements SmartyStreetsService.BlockingInterface {
 
