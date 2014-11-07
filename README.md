@@ -1,5 +1,7 @@
 # SmartyStreets
 
+[ ![Codeship Status for peter-edge/smartystreets-java](https://codeship.io/projects/090cbb30-48b9-0132-bb46-729095aef022/status)](https://codeship.io/projects/45958)
+
 SmartyStreets API Wrapper for Java.
 
 Wraps both the Street Address API and Zipcode API.
@@ -66,7 +68,7 @@ http://www.locality.com
 ## Authors
 
 Peter Edge  
-peter@locality.com  
+peter.edge@gmail.com  
 http://github.com/peter-edge
 
 ## License
